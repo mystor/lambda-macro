@@ -1,0 +1,16 @@
+[package]
+
+name = "lambdas"
+version = "0.0.1"
+authors = [ "Michael Layzell <michael@thelayzells.com>" ]
+
+[lib]
+
+plugin = true
+name = "lambdas"
+path = "src/lib.rs"
+
+[[bin]]
+
+name = "adder"
+path = "example/adder.rs"

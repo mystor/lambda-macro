@@ -6,25 +6,27 @@ macro_rules! lambda {
         [$($capt:ident : $cty:ty),+] ($($arg:ident : $aty:ty),*) -> $ty:ty $body:expr
     ) => (
         {
-            struct Closure($($cty),*); // Create the closure
-            impl Fn<($($aty ,)*), $ty> for Closure { // Implement the fn type
+            #[allow(dead_code)]
+            struct Closure($($cty),*);
+            impl Fn<($($aty ,)*), $ty> for Closure {
                 extern "rust-call" fn call(&self, args: ($($aty ,)*)) -> $ty {
-                    let ($($arg ,)*) = args;
-                    let &Closure($($capt),*) = self;
+                    let ($($arg ,)*) = args; // Expand lambda args
+                    let &Closure($($capt),*) = self; // Expand lambda captures
                     $body
                 }
             }
-            box Closure($($capt),*) // Return a box for it
+            box Closure($($capt),*)
         }
     );
     (
         [] ($($arg:ident : $aty:ty),*) -> $ty:ty $body:expr
     ) => (
         {
+            #[allow(dead_code)]
             struct Closure;
             impl Fn<($($aty ,)*), $ty> for Closure {
                 extern "rust-call" fn call(&self, args: ($($aty ,)*)) -> $ty {
-                    let ($($arg ,)*) = args;
+                    let ($($arg ,)*) = args; // Expand lambda args
                     $body
                 }
             }

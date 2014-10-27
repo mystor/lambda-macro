@@ -3,7 +3,7 @@
 #[macro_export]
 macro_rules! lambda {
     (
-        [$($capt:ident : $cty:ty),*] ($($arg:ident : $aty:ty),*) -> $ty:ty $body:expr
+        [$($capt:ident : $cty:ty),+] ($($arg:ident : $aty:ty),*) -> $ty:ty $body:expr
     ) => (
         {
             struct Closure($($cty),*); // Create the closure
@@ -15,6 +15,20 @@ macro_rules! lambda {
                 }
             }
             box Closure($($capt),*) // Return a box for it
+        }
+    );
+    (
+        [] ($($arg:ident : $aty:ty),*) -> $ty:ty $body:expr
+    ) => (
+        {
+            struct Closure;
+            impl Fn<($($aty ,)*), $ty> for Closure {
+                extern "rust-call" fn call(&self, args: ($($aty ,)*)) -> $ty {
+                    let ($($arg ,)*) = args;
+                    $body
+                }
+            }
+            box Closure
         }
     )
 }
